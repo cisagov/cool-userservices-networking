@@ -4,9 +4,24 @@
 # You must provide a value for each of these parameters.
 # ------------------------------------------------------------------------------
 
-variable "subnet_id" {
+variable "cool_cidr_block" {
   type        = string
-  description = "The ID of the AWS subnet to deploy into (e.g. subnet-0123456789abcdef0)"
+  description = "The overall CIDR block associated with the COOL (e.g. \"10.128.0.0/9\")."
+}
+
+variable "private_subnet_cidr_blocks" {
+  type        = list(string)
+  description = "The CIDR blocks corresponding to the private subnets to be associated with the VPC (e.g. [\"10.10.0.0/24\", \"10.10.1.0/24\"]).  This list must be the same length as public_subnet_cidr_blocks, since each private subnet will be assigned a NAT gateway in a public subnet in the same Availability Zone."
+}
+
+variable "public_subnet_cidr_blocks" {
+  type        = list(string)
+  description = "The CIDR blocks corresponding to the public subnets to be associated with the VPC (e.g. [\"10.10.0.0/24\", \"10.10.1.0/24\"]).  This list must be the same length as private_subnet_cidr_blocks, since each private subnet will be assigned a NAT gateway in a public subnet in the same Availability Zone."
+}
+
+variable "vpc_cidr_block" {
+  type        = string
+  description = "The overall CIDR block to be associated with the VPC (e.g. \"10.10.0.0/16\")."
 }
 
 # ------------------------------------------------------------------------------
@@ -14,22 +29,23 @@ variable "subnet_id" {
 #
 # These parameters have reasonable defaults.
 # ------------------------------------------------------------------------------
-variable "ami_owner_account_id" {
-  type        = string
-  description = "The ID of the AWS account that owns the Example AMI, or \"self\" if the AMI is owned by the same account as the provisioner."
-  default     = "self"
-}
-
-variable "aws_availability_zone" {
-  type        = string
-  description = "The AWS availability zone to deploy into (e.g. a, b, c, etc.)"
-  default     = "a"
-}
 
 variable "aws_region" {
   type        = string
   description = "The AWS region to deploy into (e.g. us-east-1)"
   default     = "us-east-1"
+}
+
+variable "provisionnetworking_policy_description" {
+  type        = string
+  description = "The description to associate with the IAM policy that allows provisioning of the networking layer in the User Services account."
+  default     = "Allows provisioning of the networking layer in the User Services account."
+}
+
+variable "provisionnetworking_policy_name" {
+  type        = string
+  description = "The name to assign the IAM policy that allows provisioning of the networking layer in the User Services account."
+  default     = "ProvisionNetworking"
 }
 
 variable "tags" {
