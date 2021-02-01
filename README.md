@@ -2,38 +2,32 @@
 
 [![GitHub Build Status](https://github.com/cisagov/cool-userservices-networking/workflows/build/badge.svg)](https://github.com/cisagov/cool-userservices-networking/actions)
 
-This is a generic skeleton project that can be used to quickly get a
-new [cisagov](https://github.com/cisagov) [Terraform
-module](https://www.terraform.io/docs/modules/index.html) GitHub
-repository started.  This skeleton project contains [licensing
-information](LICENSE), as well as [pre-commit
-hooks](https://pre-commit.com) and
-[GitHub Actions](https://github.com/features/actions) configurations
-appropriate for the major languages that we use.
+This is a Terraform deployment for creating the VPC, public subnets,
+and private subnets for the COOL User Services account.
 
-See [here](https://www.terraform.io/docs/modules/index.html) for more
-details on Terraform modules and the standard module structure.
+Until this project moves to Terraform 0.13, there is [no `depends_on`
+support for modules](https://github.com/hashicorp/terraform/issues/17101),
+and we have no way to ensure that the `ProvisionNetworking` policy is attached
+to the `ProvisionAccount` role before Terraform attempts to instantiate
+the subnet modules.  Therefore, in order to apply this Terraform code,
+one must run a targeted apply before running a full apply:
 
-## Usage ##
-
-```hcl
-module "example" {
-  source = "github.com/cisagov/cool-userservices-networking"
-
-  aws_region            = "us-west-1"
-  aws_availability_zone = "b"
-  subnet_id             = "subnet-0123456789abcdef0"
-
-  tags = {
-    Key1 = "Value1"
-    Key2 = "Value2"
-  }
-}
+```console
+terraform apply -var-file=<workspace>.tfvars -target=aws_iam_role_policy_attachment.provisionnetworking_policy_attachment -target=aws_iam_policy.provisionnetworking_policy
 ```
 
-## Examples ##
+At this point the `ProvisionNetworking` policy is attached to the
+`ProvisionAccount` role and you can run a full `terraform apply`.
 
-* [Deploying into the default VPC](https://github.com/cisagov/cool-userservices-networking/tree/develop/examples/default_vpc)
+## Pre-requisites ##
+
+- [Terraform](https://www.terraform.io/) installed on your system.
+- An accessible AWS S3 bucket to store Terraform state
+  (specified in [backend.tf](backend.tf)).
+- An accessible AWS DynamoDB database to store the Terraform state lock
+  (specified in [backend.tf](backend.tf)).
+- Access to all of the Terraform remote states specified in
+  [remote_states.tf](remote_states.tf).
 
 ## Requirements ##
 
@@ -47,39 +41,38 @@ module "example" {
 | Name | Version |
 |------|---------|
 | aws | ~> 3.0 |
+| aws.organizationsreadonly | ~> 3.0 |
+| aws.sharedservicesprovisionaccount | ~> 3.0 |
+| aws.userservicesprovisionaccount | ~> 3.0 |
+| terraform | n/a |
 
 ## Inputs ##
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| ami_owner_account_id | The ID of the AWS account that owns the Example AMI, or "self" if the AMI is owned by the same account as the provisioner. | `string` | `self` | no |
-| aws_availability_zone | The AWS availability zone to deploy into (e.g. a, b, c, etc.) | `string` | `a` | no |
 | aws_region | The AWS region to deploy into (e.g. us-east-1) | `string` | `us-east-1` | no |
-| subnet_id | The ID of the AWS subnet to deploy into (e.g. subnet-0123456789abcdef0) | `string` | n/a | yes |
+| cool_cidr_block | The overall CIDR block associated with the COOL (e.g. "10.128.0.0/9"). | `string` | n/a | yes |
+| private_subnet_cidr_blocks | The CIDR blocks corresponding to the private subnets to be associated with the VPC (e.g. ["10.10.0.0/24", "10.10.1.0/24"]).  This list must be the same length as public_subnet_cidr_blocks, since each private subnet will be assigned a NAT gateway in a public subnet in the same Availability Zone. | `list(string)` | n/a | yes |
+| provisionnetworking_policy_description | The description to associate with the IAM policy that allows provisioning of the networking layer in the User Services account. | `string` | `Allows provisioning of the networking layer in the User Services account.` | no |
+| provisionnetworking_policy_name | The name to assign the IAM policy that allows provisioning of the networking layer in the User Services account. | `string` | `ProvisionNetworking` | no |
+| public_subnet_cidr_blocks | The CIDR blocks corresponding to the public subnets to be associated with the VPC (e.g. ["10.10.0.0/24", "10.10.1.0/24"]).  This list must be the same length as private_subnet_cidr_blocks, since each private subnet will be assigned a NAT gateway in a public subnet in the same Availability Zone. | `list(string)` | n/a | yes |
 | tags | Tags to apply to all AWS resources created | `map(string)` | `{}` | no |
+| vpc_cidr_block | The overall CIDR block to be associated with the VPC (e.g. "10.10.0.0/16"). | `string` | n/a | yes |
 
 ## Outputs ##
 
 | Name | Description |
 |------|-------------|
-| arn | The EC2 instance ARN |
-| availability_zone | The AZ where the EC2 instance is deployed |
-| id | The EC2 instance ID |
-| private_ip | The private IP of the EC2 instance |
-| subnet_id | The ID of the subnet where the EC2 instance is deployed |
+| private_subnet_nat_gws | The NAT gateways used in the private subnets in the VPC. |
+| private_subnets | The private subnets in the VPC. |
+| public_subnets | The public subnets in the VPC. |
+| transit_gateway_id | The ID of the Transit Gateway in the Shared Services account. |
+| vpc | The User Services VPC. |
 
 ## Notes ##
 
 Running `pre-commit` requires running `terraform init` in every directory that
-contains Terraform code. In this repository, these are the main directory and
-every directory under `examples/`.
-
-## New Repositories from a Skeleton ##
-
-Please see our [Project Setup guide](https://github.com/cisagov/development-guide/tree/develop/project_setup)
-for step-by-step instructions on how to start a new repository from
-a skeleton. This will save you time and effort when configuring a
-new repository!
+contains Terraform code. In this repository, this is just the main directory.
 
 ## Contributing ##
 
