@@ -13,11 +13,6 @@ output "public_subnets" {
   description = "The public subnets in the VPC."
 }
 
-output "transit_gateway_id" {
-  value       = local.transit_gateway_id
-  description = "The ID of the Transit Gateway in the Shared Services account."
-}
-
 output "vpc" {
   value       = aws_vpc.userservices
   description = "The User Services VPC."

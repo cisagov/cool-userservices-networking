@@ -66,7 +66,6 @@ At this point the `ProvisionNetworking` policy is attached to the
 | private_subnet_nat_gws | The NAT gateways used in the private subnets in the VPC. |
 | private_subnets | The private subnets in the VPC. |
 | public_subnets | The public subnets in the VPC. |
-| transit_gateway_id | The ID of the Transit Gateway in the Shared Services account. |
 | vpc | The User Services VPC. |
 
 ## Notes ##
