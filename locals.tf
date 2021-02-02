@@ -35,10 +35,6 @@ locals {
   # Gateway in the Shared Services account.
   transit_gateway_default_route_table_id = data.terraform_remote_state.sharedservices_networking.outputs.transit_gateway.association_default_route_table_id
 
-  # The ID of the route table to be associated with the Transit
-  # Gateway attachment for this User Services account.
-  transit_gateway_route_table_id = data.terraform_remote_state.sharedservices_networking.outputs.transit_gateway_attachment_route_tables[local.userservices_account_id].id
-
   # The User Services account ID
   userservices_account_id = data.aws_caller_identity.userservices.account_id
 
