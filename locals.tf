@@ -31,6 +31,19 @@ locals {
   # The ID of the Transit Gateway in the Shared Services account.
   transit_gateway_id = data.terraform_remote_state.sharedservices_networking.outputs.transit_gateway.id
 
+  # Determine the env* accounts of the same type as this User Services account
+  env_accounts_same_type = {
+    for account in data.aws_organizations_organization.cool.accounts :
+    account.id => account.name
+    if length(regexall("env[0-9]+ \\((${local.userservices_account_type})\\)", account.name)) > 0
+  }
+
+  # Determine the PCA account of the same type as this User Services account
+  pca_account_same_type = {
+    for account in data.aws_organizations_organization.cool.accounts :
+    account.id => account.name
+    if length(regexall("PCA \\((${local.userservices_account_type})\\)", account.name)) > 0
+  }
 
   # The User Services account ID
   userservices_account_id = data.aws_caller_identity.userservices.account_id

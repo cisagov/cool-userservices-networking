@@ -15,3 +15,15 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "userservices" {
   transit_gateway_id = local.transit_gateway_id
   vpc_id             = aws_vpc.userservices.id
 }
+
+# Add route to User Services VPC to the route tables of other accounts
+# that may require it
+resource "aws_ec2_transit_gateway_route" "userservices_routes" {
+  provider = aws.sharedservicesprovisionaccount
+
+  for_each = merge(local.env_accounts_same_type, local.pca_account_same_type)
+
+  destination_cidr_block         = aws_vpc.userservices.cidr_block
+  transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.userservices.id
+  transit_gateway_route_table_id = data.terraform_remote_state.sharedservices_networking.outputs.transit_gateway_attachment_route_tables[each.key].id
+}
