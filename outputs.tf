@@ -1,24 +1,19 @@
-output "arn" {
-  value       = aws_instance.example.arn
-  description = "The EC2 instance ARN"
+output "private_subnet_nat_gws" {
+  value       = aws_nat_gateway.nat_gws
+  description = "The NAT gateways used in the private subnets in the VPC."
 }
 
-output "availability_zone" {
-  value       = aws_instance.example.availability_zone
-  description = "The AZ where the EC2 instance is deployed"
+output "private_subnets" {
+  value       = module.private.subnets
+  description = "The private subnets in the VPC."
 }
 
-output "id" {
-  value       = aws_instance.example.id
-  description = "The EC2 instance ID"
+output "public_subnets" {
+  value       = module.public.subnets
+  description = "The public subnets in the VPC."
 }
 
-output "private_ip" {
-  value       = aws_instance.example.private_ip
-  description = "The private IP of the EC2 instance"
-}
-
-output "subnet_id" {
-  value       = aws_instance.example.subnet_id
-  description = "The ID of the subnet where the EC2 instance is deployed"
+output "vpc" {
+  value       = aws_vpc.userservices
+  description = "The User Services VPC."
 }
