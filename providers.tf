@@ -26,6 +26,26 @@ provider "aws" {
   }
 }
 
+# The provider used to create resources inside the Terraform account.
+provider "aws" {
+  alias  = "terraformprovisionaccount"
+  region = var.aws_region
+  assume_role {
+    role_arn     = data.terraform_remote_state.terraform.outputs.provisionaccount_role.arn
+    session_name = local.caller_user_name
+  }
+}
+
+# The provider used to create resources inside the Users account.
+provider "aws" {
+  alias  = "users"
+  region = var.aws_region
+  assume_role {
+    role_arn     = data.terraform_remote_state.users.outputs.provisionaccount_role.arn
+    session_name = local.caller_user_name
+  }
+}
+
 # The provider used to create resources inside the User Services account.
 provider "aws" {
   alias  = "userservicesprovisionaccount"
