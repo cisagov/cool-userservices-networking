@@ -16,5 +16,5 @@ module "read_terraform_state" {
   role_name                   = var.read_terraform_state_role_name
   role_tags                   = var.tags
   terraform_state_bucket_name = "cisa-cool-terraform-state"
-  terraform_state_path        = "cool-sharedservices-networking/*.tfstate"
+  terraform_state_path        = "cool-userservices-networking/*.tfstate"
 }
