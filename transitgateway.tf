@@ -11,7 +11,6 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "userservices" {
   provider = aws.userservicesprovisionaccount
 
   subnet_ids         = [for subnet in module.private.subnets : subnet.id]
-  tags               = var.tags
   transit_gateway_id = local.transit_gateway_id
   vpc_id             = aws_vpc.userservices.id
 }
