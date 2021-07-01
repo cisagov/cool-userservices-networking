@@ -16,7 +16,6 @@ resource "aws_vpc" "userservices" {
 
   cidr_block           = var.vpc_cidr_block
   enable_dns_hostnames = true
-  tags                 = var.tags
 }
 
 # The internet gateway for the VPC
@@ -24,5 +23,4 @@ resource "aws_internet_gateway" "userservices" {
   provider = aws.userservicesprovisionaccount
 
   vpc_id = aws_vpc.userservices.id
-  tags   = var.tags
 }
