@@ -82,6 +82,7 @@ data "aws_iam_policy_document" "provisionnetworking_policy_doc" {
       "logs:DeleteLogGroup",
       "logs:ListTagsLogGroup",
       "logs:PutRetentionPolicy",
+      "logs:TagLogGroup",
     ]
 
     resources = [
