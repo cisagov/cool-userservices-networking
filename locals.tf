@@ -63,9 +63,9 @@ locals {
   userservices_account_type = length(regexall("\\(([^()]*)\\)", local.userservices_account_name)) == 1 ? regex("\\(([^()]*)\\)", local.userservices_account_name)[0] : "Unknown"
   workspace_type            = lower(local.userservices_account_type)
 
-  # Find the Users account by name and email.
+  # Find the Users account by name.
   users_account_id = [
     for x in data.aws_organizations_organization.cool.accounts :
-    x.id if x.name == "Users" && length(regexall("2020", x.email)) > 0
+    x.id if x.name == "Users"
   ][0]
 }
