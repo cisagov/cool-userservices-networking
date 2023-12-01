@@ -29,21 +29,22 @@ At this point the `ProvisionNetworking` policy is attached to the
 - Access to all of the Terraform remote states specified in
   [remote_states.tf](remote_states.tf).
 
+<!-- BEGIN_TF_DOCS -->
 ## Requirements ##
 
 | Name | Version |
 |------|---------|
 | terraform | ~> 1.0 |
-| aws | ~> 3.38 |
+| aws | ~> 4.9 |
 
 ## Providers ##
 
 | Name | Version |
 |------|---------|
-| aws | ~> 3.38 |
-| aws.organizationsreadonly | ~> 3.38 |
-| aws.sharedservicesprovisionaccount | ~> 3.38 |
-| aws.userservicesprovisionaccount | ~> 3.38 |
+| aws | ~> 4.9 |
+| aws.organizationsreadonly | ~> 4.9 |
+| aws.sharedservicesprovisionaccount | ~> 4.9 |
+| aws.userservicesprovisionaccount | ~> 4.9 |
 | terraform | n/a |
 
 ## Modules ##
@@ -108,6 +109,7 @@ At this point the `ProvisionNetworking` policy is attached to the
 | public\_subnets | The public subnets in the VPC. |
 | read\_terraform\_state | The IAM policies and role that allow read-only access to the cool-userservices-networking state in the Terraform state bucket. |
 | vpc | The User Services VPC. |
+<!-- END_TF_DOCS -->
 
 ## Notes ##
 
