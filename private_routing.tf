@@ -29,8 +29,8 @@ resource "aws_route" "cool_routes" {
 
   for_each = toset(var.private_subnet_cidr_blocks)
 
-  route_table_id         = aws_route_table.private_route_tables[each.value].id
   destination_cidr_block = var.cool_cidr_block
+  route_table_id         = aws_route_table.private_route_tables[each.value].id
   transit_gateway_id     = local.transit_gateway_id
 }
 
@@ -41,9 +41,9 @@ resource "aws_route" "external_routes" {
 
   for_each = toset(var.private_subnet_cidr_blocks)
 
-  route_table_id         = aws_route_table.private_route_tables[each.value].id
   destination_cidr_block = "0.0.0.0/0"
   nat_gateway_id         = aws_nat_gateway.nat_gws[each.value].id
+  route_table_id         = aws_route_table.private_route_tables[each.value].id
 }
 
 # Associate the routing tables with the subnets
@@ -52,6 +52,6 @@ resource "aws_route_table_association" "private_route_table_associations" {
 
   for_each = toset(var.private_subnet_cidr_blocks)
 
-  subnet_id      = module.private.subnets[each.value].id
   route_table_id = aws_route_table.private_route_tables[each.value].id
+  subnet_id      = module.private.subnets[each.value].id
 }

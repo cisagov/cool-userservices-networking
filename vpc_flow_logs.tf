@@ -8,7 +8,7 @@ module "vpc_flow_logs" {
     aws = aws.userservicesprovisionaccount
   }
 
-  vpc_name       = "userservices"
-  vpc_id         = aws_vpc.userservices.id
   logs_retention = "365"
+  vpc_id         = aws_vpc.userservices.id
+  vpc_name       = "userservices"
 }
