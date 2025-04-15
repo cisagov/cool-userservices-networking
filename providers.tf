@@ -43,13 +43,7 @@ provider "aws" {
     session_name = local.caller_user_name
   }
   default_tags {
-    # It makes no sense to associate a "Workspace" tag with the
-    # Terraform read role, since it can read the state from any
-    # workspace.
-    #
-    # Such a tag will also flip flop as one switched from staging to
-    # production or vice versa, which is highly annoying.
-    tags = { for k, v in var.tags : k => v if k != "Workspace" }
+    tags = var.tags
   }
   region = var.aws_region
 }
