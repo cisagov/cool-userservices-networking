@@ -5,12 +5,8 @@
 This is a Terraform deployment for creating the VPC, public subnets,
 and private subnets for the COOL User Services account.
 
-Until this project moves to Terraform 0.13, there is [no `depends_on`
-support for modules](https://github.com/hashicorp/terraform/issues/17101),
-and we have no way to ensure that the `ProvisionNetworking` policy is attached
-to the `ProvisionAccount` role before Terraform attempts to instantiate
-the subnet modules.  Therefore, in order to apply this Terraform code,
-one must run a targeted apply before running a full apply:
+In order to apply this Terraform code, one must run a targeted apply before
+running a full apply:
 
 ```console
 terraform apply -var-file=<workspace>.tfvars -target=aws_iam_role_policy_attachment.provisionnetworking_policy_attachment -target=aws_iam_policy.provisionnetworking_policy
@@ -54,7 +50,7 @@ At this point the `ProvisionNetworking` policy is attached to the
 | private | github.com/cisagov/distributed-subnets-tf-module | n/a |
 | public | github.com/cisagov/distributed-subnets-tf-module | n/a |
 | read\_terraform\_state | github.com/cisagov/terraform-state-read-role-tf-module | n/a |
-| vpc\_flow\_logs | trussworks/vpc-flow-logs/aws | >=2.0.0, <2.1.0 |
+| vpc\_flow\_logs | trussworks/vpc-flow-logs/aws | ~>2.0 |
 
 ## Resources ##
 
@@ -98,6 +94,7 @@ At this point the `ProvisionNetworking` policy is attached to the
 | public\_subnet\_cidr\_blocks | The CIDR blocks corresponding to the public subnets to be associated with the VPC (e.g. ["10.10.0.0/24", "10.10.1.0/24"]).  This list must be the same length as private\_subnet\_cidr\_blocks, since each private subnet will be assigned a NAT gateway in a public subnet in the same Availability Zone. | `list(string)` | n/a | yes |
 | read\_terraform\_state\_role\_name | The name to assign the IAM role (as well as the corresponding policy) that allows read-only access to the cool-userservices-networking state in the S3 bucket where Terraform state is stored. | `string` | `"ReadUserServicesNetworkingTerraformState"` | no |
 | tags | Tags to apply to all AWS resources created. | `map(string)` | `{}` | no |
+| terraform\_state\_bucket | The name of the S3 bucket where Terraform state is stored. | `string` | n/a | yes |
 | vpc\_cidr\_block | The overall CIDR block to be associated with the VPC (e.g. "10.10.0.0/16"). | `string` | n/a | yes |
 
 ## Outputs ##
