@@ -31,37 +31,38 @@ locals {
   # The ID of the Transit Gateway in the Shared Services account.
   transit_gateway_id = data.terraform_remote_state.sharedservices_networking.outputs.transit_gateway.id
 
-  # Determine the env* accounts of the same type as this User Services account
-  env_accounts_same_type = {
-    for account in data.aws_organizations_organization.cool.accounts :
-    account.id => account.name
-    if length(regexall("env[0-9]+ \\((${local.userservices_account_type})\\)", account.name)) > 0
-  }
-
-  # Determine the PCA account of the same type as this User Services account
-  pca_account_same_type = {
-    for account in data.aws_organizations_organization.cool.accounts :
-    account.id => account.name
-    if length(regexall("PCA \\((${local.userservices_account_type})\\)", account.name)) > 0
-  }
-
   # The User Services account ID
   userservices_account_id = data.aws_caller_identity.userservices.account_id
 
-  # Look up User Services account name from AWS organizations
-  # provider
+  # Look up User Services account name from AWS organizations provider
   userservices_account_name = [
-    for account in data.aws_organizations_organization.cool.accounts :
+    for account in data.aws_organizations_organization.cool.non_master_accounts :
     account.name
     if account.id == local.userservices_account_id
   ][0]
 
-  # Determine User Services account type based on account name.
-  #
-  # The account name format is "ACCOUNT_NAME (ACCOUNT_TYPE)" - for
-  # example, "User Services (Production)".
-  userservices_account_type = length(regexall("\\(([^()]*)\\)", local.userservices_account_name)) == 1 ? regex("\\(([^()]*)\\)", local.userservices_account_name)[0] : "Unknown"
-  workspace_type            = lower(local.userservices_account_type)
+  # Determine the env* account IDs that are the same type (production, staging,
+  # etc.) as the User Services account.
+  # Account name format:  "ACCOUNT_NAME (ACCOUNT_TYPE)"
+  #         For example:  "User Services (Production)"
+  # NOTE: Originally, our account names followed the "ACCOUNT_NAME
+  # (ACCOUNT_TYPE)" format above, but our thinking has changed and in newer
+  # environments the accounts are simply called "User Services" and "env0" (for
+  # example).  However, until all legacy environments have been migrated to this
+  # new naming scheme, we must check the User Services account name via the
+  # regex below to determine whether we are using the legacy naming scheme or
+  # not.
+  userservices_account_name_type = length(regexall("\\(([^()]*)\\)", local.userservices_account_name)) == 1 ? "legacy" : "current"
+
+  assessment_account_name_regex = local.userservices_account_name_type == "legacy" ? format("^env[[:digit:]]+ \\(%s\\)$", trim(split("(", local.userservices_account_name)[1], ")")) : "^env[[:digit:]]+$"
+
+  # Build a map of dynamic assessment account IDs whose account names match our
+  # regex
+  env_accounts = {
+    for account in data.aws_organizations_organization.cool.non_master_accounts :
+    account.id => account.name
+    if length(regexall(local.assessment_account_name_regex, account.name)) > 0
+  }
 
   # Find the Users account by name.
   users_account_id = [

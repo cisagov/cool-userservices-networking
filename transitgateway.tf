@@ -20,7 +20,7 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "userservices" {
 resource "aws_ec2_transit_gateway_route" "userservices_routes" {
   provider = aws.sharedservicesprovisionaccount
 
-  for_each = merge(local.env_accounts_same_type, local.pca_account_same_type)
+  for_each = local.env_accounts
 
   destination_cidr_block         = aws_vpc.userservices.cidr_block
   transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.userservices.id
