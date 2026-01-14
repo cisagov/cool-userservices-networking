@@ -1,6 +1,8 @@
 # cool-userservices-networking #
 
 [![GitHub Build Status](https://github.com/cisagov/cool-userservices-networking/workflows/build/badge.svg)](https://github.com/cisagov/cool-userservices-networking/actions)
+[![License](https://img.shields.io/github/license/cisagov/cool-userservices-networking)](https://spdx.org/licenses/)
+[![CodeQL](https://github.com/cisagov/cool-userservices-networking/workflows/CodeQL/badge.svg)](https://github.com/cisagov/cool-userservices-networking/actions/workflows/codeql-analysis.yml)
 
 This is a Terraform deployment for creating the VPC, public subnets,
 and private subnets for the COOL User Services account.
