@@ -34,27 +34,8 @@ locals {
   # The User Services account ID
   userservices_account_id = data.aws_caller_identity.userservices.account_id
 
-  # Look up User Services account name from AWS organizations provider
-  userservices_account_name = [
-    for account in data.aws_organizations_organization.cool.non_master_accounts :
-    account.name
-    if account.id == local.userservices_account_id
-  ][0]
-
-  # Determine the env* account IDs that are the same type (production, staging,
-  # etc.) as the User Services account.
-  # Account name format:  "ACCOUNT_NAME (ACCOUNT_TYPE)"
-  #         For example:  "User Services (Production)"
-  # NOTE: Originally, our account names followed the "ACCOUNT_NAME
-  # (ACCOUNT_TYPE)" format above, but our thinking has changed and in newer
-  # environments the accounts are simply called "User Services" and "env0" (for
-  # example).  However, until all legacy environments have been migrated to this
-  # new naming scheme, we must check the User Services account name via the
-  # regex below to determine whether we are using the legacy naming scheme or
-  # not.
-  userservices_account_name_type = length(regexall("\\(([^()]*)\\)", local.userservices_account_name)) == 1 ? "legacy" : "current"
-
-  assessment_account_name_regex = local.userservices_account_name_type == "legacy" ? format("^env[[:digit:]]+ \\(%s\\)$", trim(split("(", local.userservices_account_name)[1], ")")) : "^env[[:digit:]]+$"
+  # Regex to match dynamic assessment account names
+  assessment_account_name_regex = "^env[[:digit:]]+$"
 
   # Build a map of dynamic assessment account IDs whose account names match our
   # regex
